@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسجيل الدخول | كوكب الشارلوكيين</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0d0b1a;
+    --panel:#15132a;
+    --purple:#8a2be2;
+    --cyan:#00e5ff;
+    --pink:#ff2d95;
+    --text:#e8e6f5;
+    --muted:#8b87a8;
+    --danger:#ff4d6d;
+    --line: rgba(138,43,226,.3);
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+    background:var(--bg); color:var(--text); font-family:'Tajawal',sans-serif; padding:20px;
+    background-image:
+      radial-gradient(circle at 15% 15%, rgba(138,43,226,.25), transparent 45%),
+      radial-gradient(circle at 85% 85%, rgba(0,229,255,.18), transparent 45%),
+      radial-gradient(circle at 85% 15%, rgba(255,45,149,.12), transparent 40%);
+  }
+  .card{
+    width:100%; max-width:400px; background:var(--panel); border:1px solid var(--line);
+    border-radius:16px; padding:34px 28px; position:relative; overflow:hidden;
+    box-shadow:0 20px 60px rgba(0,0,0,.5), 0 0 0 1px rgba(255,255,255,.02) inset;
+  }
+  .card::before{
+    content:""; position:absolute; top:0; right:0; left:0; height:4px;
+    background:linear-gradient(90deg, var(--purple), var(--cyan), var(--pink), var(--purple));
+    background-size:300% 100%; animation:rgb-flow 4s linear infinite;
+  }
+  @keyframes rgb-flow{ 0%{background-position:0% 0;} 100%{background-position:300% 0;} }
+
+  .logo{
+    width:64px; height:64px; margin:8px auto 16px; border-radius:16px;
+    background:linear-gradient(135deg, var(--purple), var(--pink));
+    display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:900;
+    box-shadow:0 0 30px rgba(138,43,226,.5);
+  }
+  h1{ text-align:center; font-size:22px; font-weight:900; color:#fff; margin-bottom:4px;}
+  .sub{ text-align:center; font-size:13px; color:var(--muted); margin-bottom:26px;}
+  .sub span{ color:var(--cyan); }
+
+  .tabs{
+    display:flex; background:#0d0b1a; border-radius:10px; padding:4px; margin-bottom:22px; border:1px solid var(--line);
+  }
+  .tab{
+    flex:1; text-align:center; padding:10px; font-size:14px; cursor:pointer; color:var(--muted);
+    background:transparent; border:none; border-radius:8px; font-family:'Tajawal'; font-weight:700; transition:.2s;
+  }
+  .tab.active{ background:linear-gradient(135deg, var(--purple), var(--pink)); color:#fff; }
+
+  label{ font-size:13px; color:var(--muted); display:block; margin-bottom:6px; font-weight:500;}
+  input{
+    width:100%; padding:13px 15px; margin-bottom:16px; background:#0d0b1a; border:1px solid var(--line);
+    border-radius:10px; color:var(--text); font-family:'Tajawal'; font-size:14.5px;
+  }
+  input:focus{ outline:none; border-color:var(--cyan); box-shadow:0 0 0 3px rgba(0,229,255,.12); }
+
+  .btn{
+    width:100%; padding:14px; border-radius:10px; border:none;
+    background:linear-gradient(135deg, var(--purple), var(--pink));
+    color:#fff; font-weight:900; font-size:15px; cursor:pointer; transition:.2s; font-family:'Tajawal';
+  }
+  .btn:hover{ filter:brightness(1.15); box-shadow:0 8px 25px rgba(255,45,149,.35); }
+  .btn:disabled{ opacity:.5; cursor:not-allowed; }
+
+  .msg{ font-size:13px; text-align:center; margin-top:16px; min-height:18px; font-weight:600;}
+  .msg.error{ color:var(--danger); }
+  .msg.ok{ color:var(--cyan); }
+  .hidden{ display:none !important; }
+
+  .link-btn{
+    display:block; width:100%; text-align:center; margin-top:14px; background:none; border:none;
+    color:var(--muted); font-family:'Tajawal'; font-size:12px; cursor:pointer; text-decoration:underline;
+    padding:4px;
+  }
+  .link-btn:hover{ color:var(--cyan); }
+
+  #loadingGate{
+    position:fixed; inset:0; background:var(--bg); display:flex; flex-direction:column; align-items:center;
+    justify-content:center; gap:14px; color:var(--muted); font-family:'Tajawal'; z-index:999;
+    background-image:
+      radial-gradient(circle at 15% 15%, rgba(138,43,226,.25), transparent 45%),
+      radial-gradient(circle at 85% 85%, rgba(0,229,255,.18), transparent 45%);
+  }
+  .loader-ring{
+    width:38px; height:38px; border-radius:50%;
+    border:3px solid rgba(138,43,226,.25); border-top-color:var(--cyan);
+    animation:spin .8s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  #gateOverlay{
+    position:fixed; inset:0; background:var(--bg); z-index:998;
+    display:flex; align-items:center; justify-content:center; padding:20px;
+    background-image:
+      radial-gradient(circle at 15% 15%, rgba(138,43,226,.25), transparent 45%),
+      radial-gradient(circle at 85% 85%, rgba(0,229,255,.18), transparent 45%);
+  }
+  #gateOverlay .card{ text-align:center; }
+  .gate-icon{
+    width:64px; height:64px; margin:8px auto 18px; border-radius:50%;
+    background:rgba(138,43,226,.12); border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; font-size:26px;
+  }
+  .gate-title{ font-size:19px; font-weight:900; color:#fff; margin-bottom:6px; }
+  .gate-sub{ font-size:13px; color:var(--muted); margin-bottom:22px; line-height:1.6; }
+  #gateInput{ text-align:center; letter-spacing:.5px; }
+  .shake{ animation:shake .35s; }
+  @keyframes shake{
+    10%,90%{ transform:translateX(-2px); }
+    20%,80%{ transform:translateX(4px); }
+    30%,50%,70%{ transform:translateX(-8px); }
+    40%,60%{ transform:translateX(8px); }
+  }
+</style>
+</head>
+<body>
+
+<div id="loadingGate">
+  <div class="loader-ring"></div>
+  <div>جاري التحقق من الدخول...</div>
+</div>
+
+<div id="gateOverlay" class="hidden">
+  <div class="card">
+    <div class="gate-icon">🔒</div>
+    <div class="gate-title">وقفة يا محقق</div>
+    <div class="gate-sub">هاد الموقع خاص بأعضاء العصابة فقط<br>لازم تعرف كلمة السر عشان تكمل</div>
+    <label>كلمة السر</label>
+    <input type="password" id="gateInput" placeholder="اكتب كلمة السر" autocomplete="off">
+    <button class="btn" id="gateBtn">تأكيد</button>
+    <div class="msg" id="gateMsg"></div>
+  </div>
+</div>
+
+<div class="card hidden" id="mainCard">
+  <div class="logo">🕵️</div>
+  <h1>عصابة الشارلوكيين</h1>
+  <div class="sub">مرحباً بعودتك <span>أيها المحقق</span></div>
+
+  <div class="tabs">
+    <button class="tab active" id="tabLogin">تسجيل الدخول</button>
+    <button class="tab" id="tabRegister">حساب جديد</button>
+  </div>
+
+  <div id="loginForm">
+    <label>البريد الإلكتروني</label>
+    <input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="username">
+    <label>كلمة المرور</label>
+    <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+    <button class="btn" id="loginBtn">دخول</button>
+  </div>
+
+  <div id="registerForm" class="hidden">
+    <label>اسمك داخل العصابة</label>
+    <input type="text" id="regName" placeholder="اسم مستعار أو اسمك">
+    <label>البريد الإلكتروني</label>
+    <input type="email" id="regEmail" placeholder="you@example.com" autocomplete="username">
+    <label>كلمة المرور</label>
+    <input type="password" id="regPassword" placeholder="6 أحرف على الأقل" autocomplete="new-password">
+    <button class="btn" id="registerBtn">إنشاء الحساب</button>
+  </div>
+
+  <div class="msg" id="statusMsg"></div>
+
+  <button class="link-btn" id="clearDataBtn">مشاكل بتسجيل الدخول؟ اضغط هنا لمسح البيانات والمحاولة من جديد</button>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+  (function(){
+    "use strict";
+
+    const loadingGate = document.getElementById('loadingGate');
+    const gateOverlay = document.getElementById('gateOverlay');
+    const mainCard = document.getElementById('mainCard');
+    const gateInput = document.getElementById('gateInput');
+    const gateBtn = document.getElementById('gateBtn');
+    const gateMsg = document.getElementById('gateMsg');
+
+    const SITE_PASSWORD = "عمي الحاج";
+    const GATE_KEY = "charlok_gate_passed";
+
+    function openSite(){
+      gateOverlay.classList.add('hidden');
+      loadingGate.classList.add('hidden');
+      mainCard.classList.remove('hidden');
+    }
+
+    function showGate(){
+      mainCard.classList.add('hidden');
+      loadingGate.classList.add('hidden');
+      gateOverlay.classList.remove('hidden');
+      gateInput.value = '';
+      gateInput.focus();
+    }
+
+    function checkGate(){
+      const value = gateInput.value.trim();
+      if(!value){
+        gateMsg.textContent = 'لازم تكتب كلمة السر';
+        gateMsg.className = 'msg error';
+        return;
+      }
+      if(value === SITE_PASSWORD){
+        sessionStorage.setItem(GATE_KEY, 'true');
+        openSite();
+      }else{
+        gateMsg.textContent = 'كلمة السر غلط، جرب مرة ثانية';
+        gateMsg.className = 'msg error';
+        gateInput.value = '';
+        gateInput.focus();
+        const card = gateOverlay.querySelector('.card');
+        card.classList.remove('shake');
+        void card.offsetWidth;
+        card.classList.add('shake');
+      }
+    }
+
+    gateBtn.onclick = checkGate;
+    gateInput.addEventListener('keydown', e => { if(e.key === 'Enter') checkGate(); });
+
+    const tabLogin = document.getElementById('tabLogin');
+    const tabRegister = document.getElementById('tabRegister');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const statusMsg = document.getElementById('statusMsg');
+    const loginBtn = document.getElementById('loginBtn');
+    const registerBtn = document.getElementById('registerBtn');
+    const loginEmail = document.getElementById('loginEmail');
+    const loginPassword = document.getElementById('loginPassword');
+    const regName = document.getElementById('regName');
+    const regEmail = document.getElementById('regEmail');
+    const regPassword = document.getElementById('regPassword');
+
+    tabLogin.onclick = () => {
+      tabLogin.classList.add('active'); tabRegister.classList.remove('active');
+      loginForm.classList.remove('hidden'); registerForm.classList.add('hidden');
+      statusMsg.textContent = '';
+    };
+    tabRegister.onclick = () => {
+      tabRegister.classList.add('active'); tabLogin.classList.remove('active');
+      registerForm.classList.remove('hidden'); loginForm.classList.add('hidden');
+      statusMsg.textContent = '';
+    };
+
+    function showMsg(text, ok=false){
+      statusMsg.textContent = text;
+      statusMsg.className = 'msg ' + (ok ? 'ok' : 'error');
+    }
+
+    function setBusy(btn, busy, busyText, normalText){
+      btn.disabled = busy;
+      btn.textContent = busy ? busyText : normalText;
+    }
+
+    async function doLogin(){
+      const email = loginEmail.value.trim();
+      const password = loginPassword.value;
+      if(!email || !password){ showMsg('عبّي كل الحقول'); return; }
+      setBusy(loginBtn, true, 'جاري الدخول...', 'دخول');
+      try{
+        await auth.signInWithEmailAndPassword(email, password);
+        showMsg('تم الدخول، جاري التحويل...', true);
+        window.location.replace('home.html');
+      }catch(err){
+        console.error(err);
+        showMsg(translateError(err.code));
+        setBusy(loginBtn, false, 'جاري الدخول...', 'دخول');
+      }
+    }
+
+    async function doRegister(){
+      const name = regName.value.trim();
+      const email = regEmail.value.trim();
+      const password = regPassword.value;
+      if(!name || !email || !password){ showMsg('عبّي كل الحقول'); return; }
+      if(password.length < 6){ showMsg('كلمة المرور لازم 6 أحرف على الأقل'); return; }
+      setBusy(registerBtn, true, 'جاري الإنشاء...', 'إنشاء الحساب');
+      try{
+        const cred = await auth.createUserWithEmailAndPassword(email, password);
+        await cred.user.updateProfile({ displayName: name });
+        await db.collection('members').doc(cred.user.uid).set({
+          name: name, email: email, joinedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        showMsg('تم إنشاء الحساب، جاري التحويل...', true);
+        window.location.replace('home.html');
+      }catch(err){
+        console.error(err);
+        showMsg(translateError(err.code));
+        setBusy(registerBtn, false, 'جاري الإنشاء...', 'إنشاء الحساب');
+      }
+    }
+
+    loginBtn.onclick = doLogin;
+    registerBtn.onclick = doRegister;
+
+    [loginEmail, loginPassword].forEach(el => {
+      el.addEventListener('keydown', e => { if(e.key === 'Enter') doLogin(); });
+    });
+    [regName, regEmail, regPassword].forEach(el => {
+      el.addEventListener('keydown', e => { if(e.key === 'Enter') doRegister(); });
+    });
+
+    function translateError(code){
+      const map = {
+        'auth/email-already-in-use': 'هذا البريد مسجّل مسبقاً',
+        'auth/invalid-email': 'صيغة البريد غير صحيحة',
+        'auth/weak-password': 'كلمة المرور ضعيفة',
+        'auth/user-not-found': 'ما فيه حساب بهذا البريد',
+        'auth/wrong-password': 'كلمة المرور غير صحيحة',
+        'auth/invalid-credential': 'بيانات الدخول غير صحيحة',
+        'auth/too-many-requests': 'محاولات كثيرة، جرب بعد شوي',
+        'auth/network-request-failed': 'في مشكلة بالاتصال بالإنترنت',
+        'auth/user-disabled': 'هذا الحساب موقوف',
+        'auth/missing-password': 'اكتب كلمة المرور',
+      };
+      return map[code] || 'صار خطأ، حاول مرة ثانية';
+    }
+
+    const clearDataBtn = document.getElementById('clearDataBtn');
+    clearDataBtn.onclick = async () => {
+      clearDataBtn.disabled = true;
+      clearDataBtn.textContent = 'جاري المسح...';
+      try{ if(auth.currentUser){ await auth.signOut(); } }catch(e){}
+      try{ sessionStorage.clear(); }catch(e){}
+      try{ localStorage.clear(); }catch(e){}
+      window.location.reload();
+    };
+
+    auth.onAuthStateChanged(user => {
+      if(user){
+        window.location.replace('home.html');
+      }else{
+        if(sessionStorage.getItem(GATE_KEY) === 'true'){
+          openSite();
+        }else{
+          showGate();
+        }
+      }
+    });
+
+  })();
+</script>
+</body>
+</html>
